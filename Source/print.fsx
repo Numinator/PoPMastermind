@@ -2,26 +2,34 @@
 open System.IO
 
 //Types
-type codeColor =
-Red | Green | Yellow | Purple | White | Black
+type codeColor = 
+| Red | Green | Yellow | Purple | White | Black
 
-type code = codeColor list
+type code          = codeColor list
 
-type answer = int * int
+type answer        = int * int
 
-type board = ( code * answer ) list
+type board         = ( code * answer ) list
 
-type player = Human | Computer
+type player        = Human | Computer
 
 //code
-let colPin (c : codeColor) =
+let colPin (c: codeColor) = 
   match c with
-  | Red -> "\e[31m*\e[31m"
-  | Green -> "\e[32m*\e[32m"
+  | Red    -> "R"
+  | Green  -> "G"
+  | Yellow -> "Y"
+  | Purple -> "P"
+  | White  -> "W"
+  | Black  -> "B"
 
-let printBoard brd =
-  let edge = "-----------------"
-  let mutable str = "|*|*|*|*| n - n |"
+
+
+
+
+let printBoard (brd: board) = 
+  let edge         = "-----------------"
+  let mutable str  = "|*|*|*|*| n - n |"
   Console.WriteLine edge
   for i in brd do
     
