@@ -28,8 +28,11 @@ let colPin (c: codeColor) =
 
 
 let printBoard (brd: board) = 
-  let edge         = "-----------------"
-  let mutable str  = "|*|*|*|*| n - n |"
-  Console.WriteLine edge
+  let edge:Printf.TextWriterFormat<_> = "-----------------"
+  let str:Printf.TextWriterFormat<_>  = "|%s|%s|%s|%s| %i - %i |"
+  printfn edge
   for i in brd do
-    
+    let f j =  colPin <| (fst i).[j]
+    let s = snd i
+    printfn str (f 0) (f 1) (f 2) (f 3) (fst s) (snd s)
+     
