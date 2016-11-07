@@ -1,5 +1,5 @@
 type codeColor =
-Red | Green | Yellow | Purple | White | Black
+  |Red | Green | Yellow | Purple | White | Black
 
 type code = codeColor list
 
