@@ -33,11 +33,6 @@ let rec selCode () =
     inputHelper 1
     
 //[([R, G, Y, P], (2,2)); ([R, G, Y, P], (2,2))]  
-type codeColor =
-    |Red | Green | Yellow | Purple | White | Black
-
-type code = codeColor list
-
 let numToCol n =
     match n with
     | 0 -> Red
