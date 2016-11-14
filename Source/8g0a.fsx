@@ -22,7 +22,7 @@ let rec askPlayerType () =
     else
         printfn "Wrong input"
         askPlayerType ()
-         
+
 (* NumToCol: Helper function to getRndCode *)
 let numToCol n =
     match n with
@@ -56,7 +56,7 @@ let selCode () =
     printfn "Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) | Black (b)"
     let colors = ["first color";"second color";"third color"; "fourth color"]
     let rec inputHelper i : code=
-      if i > 3 then [] 
+      if i > 3 then []
       else
         printfn "Input your %s" colors.[i]
         let c1 = (System.Console.ReadLine ()).ToLower ()
@@ -88,10 +88,10 @@ let validate (rc: code) (c: code) :answer =
   let histC       = [|0;0;0;0;0;0|]
   let histRc      = [|0;0;0;0;0;0|]
   let mutable sum = 0
-  for i=0 to 3 do 
+  for i=0 to 3 do
     if rc.[i] = c.[i] then
       b <- b + 1
-    
+
     match rc.[i] with
     | col when col = Red    -> histRc.[0]+1
     | col when col = Green  -> histRc.[1]+1
@@ -99,21 +99,21 @@ let validate (rc: code) (c: code) :answer =
     | col when col = Purple -> histRc.[3]+1
     | col when col = White  -> histRc.[4]+1
     | col when col = Black  -> histRc.[5]+1
-    
+
     match c.[i] with
     | col when col = Red    -> histC.[0]+1
     | col when col = Green  -> histC.[1]+1
     | col when col = Yellow -> histC.[2]+1
     | col when col = Purple -> histC.[3]+1
     | col when col = White  -> histC.[4]+1
-    | col when col = Black  -> histC.[5]+1 
-  
+    | col when col = Black  -> histC.[5]+1
+
   for i=0 to 5 do
     sum <- sum + (min (histC.[i]) (histRc.[i]))
-  
+
   w <- sum
   (b, w)
-      
+
 
 //validate (realCode, guess())
 
@@ -121,7 +121,7 @@ let validate (rc: code) (c: code) :answer =
 let addGuess (brd: board) (c: code) (a: answer):board=
   brd @ [(c,a)]
 (* colPin: Helper function to printBoard *)
-let colPin (c: codeColor) = 
+let colPin (c: codeColor) =
   match c with
   | Red    -> "R"
   | Green  -> "G"
@@ -131,12 +131,12 @@ let colPin (c: codeColor) =
   | Black  -> "B"
 
 (* printBoard: Part of the guess loop *)
-let printBoard (brd: board) = 
+let printBoard (brd: board) =
   let edge:Printf.TextWriterFormat<_> = "-------------------------"
   let str:Printf.TextWriterFormat<_>  = "| %s | %s | %s | %s | %i - %i |"
   printfn edge
   for i in brd do
-    let f j =  colPin <| (fst i).[j]
+    let f j =  colPin (fst i).[j]
     let s = snd i
     printfn str (f 0) (f 1) (f 2) (f 3) (fst s) (snd s)
     printfn edge
@@ -145,15 +145,16 @@ let printBoard (brd: board) =
 (* isGameOver: Part of the guess loop *)
 let isGameOver (a: answer) =
   if a = (4,0) then
-    gameOver <- true 
+    gameOver <- true
 
-let main () = 
+[<Entry Point>]
+let main () =
     printfn "%A" list
     let p = askPlayerType ()
     let realCode = makeCode (p)
     let mutable board = []
-    
-    while not(gameOver) do 
+
+    while not(gameOver) do
       let currentGuess = guess (p) board
       let answer = validate (realCode) (currentGuess)
       board <- addGuess board currentGuess answer
