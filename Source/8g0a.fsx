@@ -292,7 +292,7 @@ let printBoard (brd: board) =
 /// </returns>
 (* isGameOver: Part of the guess loop *)
 let isGameOver (a: answer) =
-  if a = (4,0) then
+  if a = (4, _) then
     gameOver <- true
 
 [<Entry Point>]
