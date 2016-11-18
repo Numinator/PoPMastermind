@@ -186,7 +186,6 @@ let guess (p:player) (brd:board) : code =
 let validate (rc: code) (c: code) :answer =
   let mutable i   = 0
   let mutable b   = 0
-  let mutable w   = 0
   let histC       = [|0;0;0;0;0;0|]
   let histRc      = [|0;0;0;0;0;0|]
   let mutable sum = 0
@@ -213,8 +212,7 @@ let validate (rc: code) (c: code) :answer =
   for i=0 to 5 do
     sum <- sum + (min (histC.[i]) (histRc.[i]))
 
-  w <- sum
-  (b, w)
+  (b, sum - b)
 
 
 /// <summary>
