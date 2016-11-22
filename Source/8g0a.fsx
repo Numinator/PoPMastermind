@@ -55,6 +55,14 @@ let numToCol n =
     | 4 -> White
     | 5 -> Black
 
+let colToNum = function
+| Red -> 0
+| Green -> 1
+| Yellow -> 2
+| Purple -> 3
+| White -> 4
+| Black -> 5
+
 
 /// <summary>
 ///    Creates a pesudo random code of length 4.
@@ -194,20 +202,20 @@ let validate (rc: code) (c: code) :answer =
       b <- b + 1
 
     match rc.[i] with
-    | col when col = Red    -> histRc.[0]+1
-    | col when col = Green  -> histRc.[1]+1
-    | col when col = Yellow -> histRc.[2]+1
-    | col when col = Purple -> histRc.[3]+1
-    | col when col = White  -> histRc.[4]+1
-    | col when col = Black  -> histRc.[5]+1
+    | Red    -> histRc.[0] <- histRc.[0]+1
+    | Green  -> histRc.[1] <- histRc.[1]+1
+    | Yellow -> histRc.[2] <- histRc.[2]+1
+    | Purple -> histRc.[3] <- histRc.[3]+1
+    | White  -> histRc.[4] <- histRc.[4]+1
+    | Black  -> histRc.[5] <- histRc.[5]+1
 
     match c.[i] with
-    | col when col = Red    -> histC.[0]+1
-    | col when col = Green  -> histC.[1]+1
-    | col when col = Yellow -> histC.[2]+1
-    | col when col = Purple -> histC.[3]+1
-    | col when col = White  -> histC.[4]+1
-    | col when col = Black  -> histC.[5]+1
+    | Red    -> histC.[0] <- histC.[0]+1
+    | Green  -> histC.[1] <- histC.[1]+1
+    | Yellow -> histC.[2] <- histC.[2]+1
+    | Purple -> histC.[3] <- histC.[3]+1
+    | White  -> histC.[4] <- histC.[4]+1
+    | Black  -> histC.[5] <- histC.[5]+1
 
   for i=0 to 5 do
     sum <- sum + (min (histC.[i]) (histRc.[i]))
@@ -295,9 +303,8 @@ let isGameOver (a: answer) =
   if a = (4, 0) then
     gameOver <- true
 
-[<Entry Point>]
 let main () =
-    printfn "%A" list
+    //printfn "%A" list
     let p = askPlayerType ()
     let realCode = makeCode (p)
     let mutable board = []
