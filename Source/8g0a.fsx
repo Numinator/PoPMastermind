@@ -55,14 +55,6 @@ let numToCol n =
     | 4 -> White
     | 5 -> Black
 
-let colToNum = function
-| Red -> 0
-| Green -> 1
-| Yellow -> 2
-| Purple -> 3
-| White -> 4
-| Black -> 5
-
 
 /// <summary>
 ///    Creates a pesudo random code of length 4.
