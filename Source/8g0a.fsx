@@ -11,26 +11,7 @@ type player = Human | Computer
 let mutable gameOver = false
 
 
-/// <summary>
-///    Asks for at player-type from the user.
-/// </summary>
-/// <remarks>
-///   Asks again recursivly if user gives wrong input. Takes unit as input.
-/// </remarks>
-/// <returns>
-///   Returns a player type (either Human or Computer).
-/// </returns>
-(* Menu: askPlayerType *)
-let rec askPlayerType () =
-    printfn "Do you want to play as Human (H/h) or Computer (C/c)?"
-    let p = (System.Console.ReadLine ()).ToLower ()
-    if p = "h" || p = "human" then
-        Human
-    elif p = "c" || p = "computer" then
-        Computer
-    else
-        printfn "Wrong input"
-        askPlayerType ()
+
 
 
 /// <summary>
@@ -100,6 +81,29 @@ let stringToCol s =
     | _                          -> None
 
 
+
+/// <summary>
+///    Asks for at player-type from the user.
+/// </summary>
+/// <remarks>
+///   Asks again recursivly if user gives wrong input. Takes unit as input.
+/// </remarks>
+/// <returns>
+///   Returns a player type (either Human or Computer).
+/// </returns>
+(* Menu: askPlayerType *)
+let rec askPlayerType () =
+    printfn "Do you want to play as Human (H/h) or Computer (C/c)?"
+    let p = (System.Console.ReadLine ()).ToLower ()
+    if p = "h" || p = "human" then
+        Human
+    elif p = "c" || p = "computer" then
+        Computer
+    else
+        printfn "Wrong input"
+        askPlayerType ()
+
+
 /// <summary>
 ///    Asks the user to input a code and returns it
 /// </summary>
@@ -121,7 +125,8 @@ let selCode () =
         let c1 = (System.Console.ReadLine ()).ToLower ()
         match stringToCol c1 with
         | None -> inputHelper i
-        | Some(c)    -> printfn "You have chosen %A" c;
+        | Some(c)    -> System.Console.Clear();
+                        printfn "You have chosen %A" c;
                         [c] @ inputHelper (i+1)
     inputHelper 0
 
@@ -247,35 +252,38 @@ let addGuess (brd: board) (c: code) (a: answer):board=
 (* colPin: Helper function to printBoard *)
 let colPin (c: codeColor) =
   match c with
-  | Red    -> "R"
-  | Green  -> "G"
-  | Yellow -> "Y"
-  | Purple -> "P"
-  | White  -> "W"
-  | Black  -> "B"
+  | Red    -> "\x1b[31;1m\u262d\x1b[37;0m"
+  | Green  -> "\x1b[32;1m\u2623\x1b[37;0m"
+  | Yellow -> "\x1b[33;1m\u2622\x1b[37;0m"
+  | Purple -> "\x1b[35;1m\ud83c\udf03\x1b[37;0m" 
+  | White  -> "\x1b[37;1m\u2620\x1b[37;0m" 
+  | Black  -> "\x1b[30;1m\u26f0\x1b[37;0m" 
+
+    
 
 
 
 /// <summary>
-///    Takes a board and prints it to the screen in a formated way.
+///    Takes a board and makes a string in a formated way, that represents the board.
 /// </summary>
 /// <param name="brd">
 ///    The board that gets printed.
 /// </param name="brd">
 /// <returns>
-///   Returns unit.
+///   Returns a string.
 /// </returns>
 (* printBoard: Part of the guess loop *)
 let printBoard (brd: board) =
-  let edge:Printf.TextWriterFormat<_> = "-------------------------"
-  let str:Printf.TextWriterFormat<_>  = "| %s | %s | %s | %s | %i - %i |"
-  printfn edge
+  let mutable brdStr = "" 
+  let edge = "[-------------------------"
+  let str: Printf.StringFormat<_>  = "[| %s | %s | %s | %s | %i - %i |"
+  brdStr <- edge + "\n"
   for i in brd do
     let f j =  colPin (fst i).[j]
     let s = snd i
-    printfn str (f 0) (f 1) (f 2) (f 3) (fst s) (snd s)
-    printfn edge
-  ()
+    brdStr <- brdStr + (sprintf str (f 0) (f 1) (f 2) (f 3) (fst s) (snd s)) + "\n"
+    brdStr <- brdStr + edge + "\n"
+  brdStr
 
 
 /// <summary>
@@ -296,6 +304,10 @@ let isGameOver (a: answer) =
     gameOver <- true
 
 let main () =
+    
+
+
+
     //printfn "%A" list
     let p = askPlayerType ()
     let realCode = makeCode (p)
@@ -306,5 +318,5 @@ let main () =
       let answer = validate (realCode) (currentGuess)
       board <- addGuess board currentGuess answer
       isGameOver (answer)
-      printBoard (board)
+      System.Console.Write (printBoard board)
 main ()
