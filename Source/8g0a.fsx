@@ -8,8 +8,13 @@ type answer = int * int
 type board = ( code * answer ) list
 
 type player = Human | Computer
-let mutable gameOver = false
 
+
+(* Global varibles*)
+let mutable GGameOver = false
+let mutable GSelctor  = 0
+let mutable GCommit = false
+let GCode = [|0; 0; 0; 0|]
 
 
 
@@ -36,6 +41,16 @@ let numToCol n =
     | 4 -> White
     | 5 -> Black
 
+let colToNum c = 
+  match c with
+  | Red    -> 0
+  | Green  -> 1
+  | Yellow -> 2
+  | Purple -> 3
+  | White  -> 4
+  | Black  -> 5
+
+
 
 /// <summary>
 ///    Creates a pesudo random code of length 4.
@@ -49,7 +64,8 @@ let numToCol n =
 (* getRdnCode: Helper function to makeCode *)
 let getRndCode ():code=
     let rnd = System.Random()
-    let list = [numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);]
+    let list = [numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);
+                numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);]
 //    [fun for _ in 1..4 -> (numToCol (rnd.Next() % 6))]
     list
 
@@ -105,30 +121,36 @@ let rec askPlayerType () =
 
 
 /// <summary>
-///    Asks the user to input a code and returns it
+///    Ask the user for a change to the input code or selector possition. 
 /// </summary>
 /// <remarks>
-///   The function does not stop before the user have inputted a valid code. It
-///   takes unit as input.
+///   Dependes on the global varibles GCommit and GSelctor
 /// </remarks>
 /// <returns>
 ///   Returns a valid code.
 /// </returns>
 (* selCode: Helper function to makeCode *)
-let selCode () =
-    printfn "Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) | Black (b)"
-    let colors = ["first color";"second color";"third color"; "fourth color"]
-    let rec inputHelper i : code=
-      if i > 3 then []
-      else
-        printfn "Input your %s" colors.[i]
-        let c1 = (System.Console.ReadLine ()).ToLower ()
-        match stringToCol c1 with
-        | None -> inputHelper i
-        | Some(c)    -> System.Console.Clear();
-                        printfn "You have chosen %A" c;
-                        [c] @ inputHelper (i+1)
-    inputHelper 0
+let selCode () : code =
+    GSelctor <- GSelctor % 4
+    let mutable bRun = true
+    while bRun do
+      let input = string <| System.Console.ReadKey true
+      match input.ToLower() with
+      | "c" -> GCommit <- true
+      | "j" -> GSelctor <- (GSelctor - 1) % 4; bRun <- false
+      | "l" -> GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "i" -> GCode.[GSelctor] <- (GCode.[GSelctor] - 1) % 6; bRun <- false
+      | "k" -> GCode.[GSelctor] <- (GCode.[GSelctor] + 1) % 6; bRun <- false
+      | "r" -> GCode.[GSelctor] <- 0; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "g" -> GCode.[GSelctor] <- 1; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "y" -> GCode.[GSelctor] <- 2; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "p" -> GCode.[GSelctor] <- 3; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "w" -> GCode.[GSelctor] <- 4; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "b" -> GCode.[GSelctor] <- 5; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | _   -> ()
+    
+    Array.map numToCol GCode |> Array.toList 
+    
 
 
 /// <summary>
@@ -287,10 +309,10 @@ let printBoard (brd: board) =
 
 
 /// <summary>
-///    Finds out if the game is over and changes gameOver to true if it is.
+///    Finds out if the game is over and changes GGameOver to true if it is.
 /// </summary>
 /// <remarks>
-///   gameOver is a global varible that must be present.
+///   GGameOver is a global varible that must be present.
 /// </remarks>
 /// <param name="a">
 ///    Answer that is used to check if the game is over.
@@ -301,22 +323,56 @@ let printBoard (brd: board) =
 (* isGameOver: Part of the guess loop *)
 let isGameOver (a: answer) =
   if a = (4, 0) then
-    gameOver <- true
+    GGameOver <- true
 
+
+let draw brd (c : code) sel =
+  // CREATES STUFF TO BE DRAWN
+  let header = "\
+     _____\n\                
+ ___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n\
+|    \  /  |  _ \ |   ____|  |_|   ___|     ||    \  /  |    |    \ | |     \\n\
+|     \/   |     \ `-.`-|_    _|   ___|     \|     \/   |    |     \| |      \\n\
+|__/\__/|__|__|\__|______||__| |______|__|\__|__/\__/|__|____|__/\____|______/\n\
+    |_____|\n\
+                           af Aiyu, Frederik & Rasmus\n\
+\n"
+  
+  let mutable strCodeWithSel = "\n    "
+  for i in 0 .. 3 do
+    if i = sel then
+      strCodeWithSel <- strCodeWithSel + "-> " + colPin(c.[i]) + " <-"
+    else 
+      strCodeWithSel <- strCodeWithSel + "  " + colPin(c.[i]) + "  "
+  strCodeWithSel <- strCodeWithSel + "\n\n\
+Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) | Bl\
+ack (b)\n\
+Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm the selcec\
+tion \n"
+
+  
+  //DRAWS WHAT HAS BEEN CREATED TO THE SCREEN
+  System.Console.Clear()
+  System.Console.Write header
+  System.Console.Write (printBoard brd)
+  System.Console.Write strCodeWithSel
+  
 let main () =
-    
-
-
+    System.Console.Title <- "Mastermind - Super Cool™ edition"
+    let mutable brd : board = []
+    draw brd [Red; Red; Red; Red] (GSelctor % 4) 
+    while not GGameOver do
+      draw brd (selCode()) GSelctor
 
     //printfn "%A" list
-    let p = askPlayerType ()
-    let realCode = makeCode (p)
-    let mutable board = []
+    // let p = askPlayerType ()
+    // let realCode = makeCode (p)
+    // let mutable board = []
 
-    while not(gameOver) do
-      let currentGuess = guess (p) board
-      let answer = validate (realCode) (currentGuess)
-      board <- addGuess board currentGuess answer
-      isGameOver (answer)
-      System.Console.Write (printBoard board)
+    // while not(GGameOver) do
+    //   let currentGuess = guess (p) board
+    //   let answer = validate (realCode) (currentGuess)
+    //   board <- addGuess board currentGuess answer
+    //   isGameOver (answer)
+    //   System.Console.Write (printBoard board)
 main ()
