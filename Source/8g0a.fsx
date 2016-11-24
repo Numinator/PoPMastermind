@@ -12,7 +12,7 @@ type player = Human | Computer
 
 (* Global varibles*)
 let mutable GGameOver = false
-let mutable GSelctor  = 0
+let mutable GSelector  = 0
 let mutable GCommit = false
 let GCode = [|0; 0; 0; 0|]
 
@@ -124,29 +124,29 @@ let rec askPlayerType () =
 ///    Ask the user for a change to the input code or selector possition. 
 /// </summary>
 /// <remarks>
-///   Dependes on the global varibles GCommit and GSelctor
+///   Dependes on the global varibles GCommit and GSelector
 /// </remarks>
 /// <returns>
 ///   Returns a valid code.
 /// </returns>
 (* selCode: Helper function to makeCode *)
 let selCode () : code =
-    GSelctor <- GSelctor % 4
+    GSelector <- GSelector % 4
     let mutable bRun = true
     while bRun do
       let input = string <| System.Console.ReadKey true
       match input.ToLower() with
-      | "c" -> GCommit <- true
-      | "j" -> GSelctor <- (GSelctor - 1) % 4; bRun <- false
-      | "l" -> GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "i" -> GCode.[GSelctor] <- (GCode.[GSelctor] - 1) % 6; bRun <- false
-      | "k" -> GCode.[GSelctor] <- (GCode.[GSelctor] + 1) % 6; bRun <- false
-      | "r" -> GCode.[GSelctor] <- 0; GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "g" -> GCode.[GSelctor] <- 1; GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "y" -> GCode.[GSelctor] <- 2; GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "p" -> GCode.[GSelctor] <- 3; GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "w" -> GCode.[GSelctor] <- 4; GSelctor <- (GSelctor + 1) % 4; bRun <- false
-      | "b" -> GCode.[GSelctor] <- 5; GSelctor <- (GSelctor + 1) % 4; bRun <- false
+      | "c" -> GCommit <- true; bRun <- false
+      | "j" -> GSelector <- (GSelector - 1) % 4; bRun <- false
+      | "l" -> GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "i" -> GCode.[GSelector] <- (GCode.[GSelector] - 1) % 6; bRun <- false
+      | "k" -> GCode.[GSelector] <- (GCode.[GSelector] + 1) % 6; bRun <- false
+      | "r" -> GCode.[GSelector] <- 0; GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "g" -> GCode.[GSelector] <- 1; GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "y" -> GCode.[GSelector] <- 2; GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "p" -> GCode.[GSelector] <- 3; GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "w" -> GCode.[GSelector] <- 4; GSelector <- (GSelector + 1) % 4; bRun <- false
+      | "b" -> GCode.[GSelector] <- 5; GSelector <- (GSelector + 1) % 4; bRun <- false
       | _   -> ()
     
     Array.map numToCol GCode |> Array.toList 
@@ -329,12 +329,12 @@ let isGameOver (a: answer) =
 let draw brd (c : code) sel =
   // CREATES STUFF TO BE DRAWN
   let header = "\
-     _____\n\                
- ___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n\
-|    \  /  |  _ \ |   ____|  |_|   ___|     ||    \  /  |    |    \ | |     \\n\
-|     \/   |     \ `-.`-|_    _|   ___|     \|     \/   |    |     \| |      \\n\
-|__/\__/|__|__|\__|______||__| |______|__|\__|__/\__/|__|____|__/\____|______/\n\
-    |_____|\n\
+*****_____\n\                
+*___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n\
+|    \\  /  |  _ \\ |   ____|  |_|   ___|     ||    \\  /  |    |    \\ | |     \\\n\
+|     \\/   |     \\ `-.`-|_    _|   ___|     \\|     \\/   |    |     \\| |      \\\n\
+|__/\\__/|__|__|\\__|______||__| |______|__|\\__|__/\\__/|__|____|__/\\____|______/\n\
+****|_____|\n\
                            af Aiyu, Frederik & Rasmus\n\
 \n"
   
@@ -345,10 +345,9 @@ let draw brd (c : code) sel =
     else 
       strCodeWithSel <- strCodeWithSel + "  " + colPin(c.[i]) + "  "
   strCodeWithSel <- strCodeWithSel + "\n\n\
-Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) | Bl\
-ack (b)\n\
-Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm the selcec\
-tion \n"
+Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) |\n\
+Black (b)\n\
+Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm selcection\n"
 
   
   //DRAWS WHAT HAS BEEN CREATED TO THE SCREEN
@@ -360,9 +359,9 @@ tion \n"
 let main () =
     System.Console.Title <- "Mastermind - Super Cool™ edition"
     let mutable brd : board = []
-    draw brd [Red; Red; Red; Red] (GSelctor % 4) 
+    draw brd [Red; Red; Red; Red] (GSelector % 4) 
     while not GGameOver do
-      draw brd (selCode()) GSelctor
+      draw brd (selCode()) GSelector
 
     //printfn "%A" list
     // let p = askPlayerType ()
