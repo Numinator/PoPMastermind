@@ -134,12 +134,12 @@ let selCode () : code =
     GSelector <- GSelector % 4
     let mutable bRun = true
     while bRun do
-      let input = string <| System.Console.ReadKey true
+      let input = string <| (System.Console.ReadKey true).Key
       match input.ToLower() with
       | "c" -> GCommit <- true; bRun <- false
       | "j" -> GSelector <- (GSelector - 1) % 4; bRun <- false
       | "l" -> GSelector <- (GSelector + 1) % 4; bRun <- false
-      | "i" -> GCode.[GSelector] <- (GCode.[GSelector] - 1) % 6; bRun <- false
+      | "i" -> GCode.[GSelector] <- (GCode.[GSelector] + 5) % 6; bRun <- false
       | "k" -> GCode.[GSelector] <- (GCode.[GSelector] + 1) % 6; bRun <- false
       | "r" -> GCode.[GSelector] <- 0; GSelector <- (GSelector + 1) % 4; bRun <- false
       | "g" -> GCode.[GSelector] <- 1; GSelector <- (GSelector + 1) % 4; bRun <- false
@@ -297,7 +297,7 @@ let colPin (c: codeColor) =
 (* printBoard: Part of the guess loop *)
 let printBoard (brd: board) =
   let mutable brdStr = "" 
-  let edge = "[-------------------------"
+  let edge = "-------------------------"
   let str: Printf.StringFormat<_>  = "[| %s | %s | %s | %s | %i - %i |"
   brdStr <- edge + "\n"
   for i in brd do
@@ -335,7 +335,7 @@ let draw brd (c : code) sel =
 |     \\/   |     \\ `-.`-|_    _|   ___|     \\|     \\/   |    |     \\| |      \\\n\
 |__/\\__/|__|__|\\__|______||__| |______|__|\\__|__/\\__/|__|____|__/\\____|______/\n\
 ****|_____|\n\
-                           af Aiyu, Frederik & Rasmus\n\
+***********af Aiyu, Frederik & Rasmus\n\
 \n"
   
   let mutable strCodeWithSel = "\n    "
