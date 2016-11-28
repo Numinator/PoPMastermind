@@ -15,14 +15,13 @@ let mutable GGameOver = false
 let mutable GSelector  = 0
 let mutable GCommit = false
 let mutable GCode = [|0; 0; 0; 0|]
-
 let GTries = 9 
 
 
 
 
 /// <summary>
-///    Converts the numbers 1-7 to its equivalent colour.
+///    Converts the numbers 0-5 to its equivalent colour.
 /// </summary>
 /// <remarks>
 ///   The function cannot handle integer input larger than 5 or less than 0.
@@ -31,7 +30,7 @@ let GTries = 9
 ///    An integer from 0 to 5, inclusive
 /// </param name="n">
 /// <returns>
-///   Returns None if the inputted integer is anything but 1-7
+///   Returns colour if the inputted integer is between 0-5
 /// </returns>
 (* NumToCol: Helper function to getRndCode *)
 let numToCol n =
