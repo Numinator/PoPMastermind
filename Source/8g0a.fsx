@@ -137,7 +137,7 @@ let selCode () : code =
       let input = string <| (System.Console.ReadKey true).Key
       match input.ToLower() with
       | "c" -> GCommit <- true; bRun <- false
-      | "j" -> GSelector <- (GSelector - 1) % 4; bRun <- false
+      | "j" -> GSelector <- (GSelector + 3) % 4; bRun <- false
       | "l" -> GSelector <- (GSelector + 1) % 4; bRun <- false
       | "i" -> GCode.[GSelector] <- (GCode.[GSelector] + 5) % 6; bRun <- false
       | "k" -> GCode.[GSelector] <- (GCode.[GSelector] + 1) % 6; bRun <- false
@@ -298,7 +298,7 @@ let colPin (c: codeColor) =
 let printBoard (brd: board) =
   let mutable brdStr = "" 
   let edge = "-------------------------"
-  let str: Printf.StringFormat<_>  = "[| %s | %s | %s | %s | %i - %i |"
+  let str: Printf.StringFormat<_>  = "| %s | %s | %s | %s | %i - %i |"
   brdStr <- edge + "\n"
   for i in brd do
     let f j =  colPin (fst i).[j]
@@ -341,9 +341,9 @@ let draw brd (c : code) sel =
   let mutable strCodeWithSel = "\n    "
   for i in 0 .. 3 do
     if i = sel then
-      strCodeWithSel <- strCodeWithSel + "-> " + colPin(c.[i]) + " <-"
+      strCodeWithSel <- strCodeWithSel + "->" + colPin(c.[i]) + " <-"
     else 
-      strCodeWithSel <- strCodeWithSel + "  " + colPin(c.[i]) + "  "
+      strCodeWithSel <- strCodeWithSel + " " + colPin(c.[i]) + "  "
   strCodeWithSel <- strCodeWithSel + "\n\n\
 Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) |\n\
 Black (b)\n\
@@ -356,12 +356,44 @@ Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm selcection\
   System.Console.Write (printBoard brd)
   System.Console.Write strCodeWithSel
   
+  //RETURN THE CODE USED FOR FUTHER USE BY OTHER FUNCTIONS
+  c
+  
 let main () =
+    // INIT
     System.Console.Title <- "Mastermind - Super Cool™ edition"
     let mutable brd : board = []
-    draw brd [Red; Red; Red; Red] (GSelector % 4) 
+
+    // GET PLAYERS
+    let p1 = askPlayerType ()
+    let p2 = askPlayerType ()
+    
+    // GET THE SECRET CODE
+    let cSecret = makeCode p1
+    
+    draw brd [Red; Red; Red; Red] GSelector |> ignore
     while not GGameOver do
-      draw brd (selCode()) GSelector
+       let c = draw brd (guess p2 brd) GSelector
+       if GCommit || p2 = Computer then
+         GCommit <- false
+         let answr = validate c cSecret
+         brd <- addGuess brd c answr
+         isGameOver answr
+    draw brd [Red; White; Red; White] GSelector |> ignore
+         
+
+
+         
+
+
+
+
+
+
+
+
+
+
 
     //printfn "%A" list
     // let p = askPlayerType ()
@@ -374,4 +406,5 @@ let main () =
     //   board <- addGuess board currentGuess answer
     //   isGameOver (answer)
     //   System.Console.Write (printBoard board)
+    ()
 main ()
