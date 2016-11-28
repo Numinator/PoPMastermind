@@ -14,7 +14,7 @@ type player = Human | Computer
 let mutable GGameOver = false
 let mutable GSelector  = 0
 let mutable GCommit = false
-let GCode = [|0; 0; 0; 0|]
+let mutable GCode = [|0; 0; 0; 0|]
 
 let GTries = 9 
 
@@ -155,23 +155,6 @@ let selCode () : code =
     
 
 
-/// <summary>
-///    Takes a player type and returns a code by the appropriate means.
-/// </summary>
-/// <remarks>
-///   Uses selCode or getRndCode to get the code
-/// </remarks>
-/// <param name="p">
-///    Player type of either Human or Computer
-/// </param name="p">
-/// <returns>
-///   Returns a code.
-/// </returns>
-(*  Game: makeCode*)
-let makeCode (p:player) =
-  match p with
-  | Human    -> selCode ()
-  | Computer -> getRndCode ()
 
 
 /// <summary>
@@ -382,6 +365,38 @@ let gameOverScreen (lstLen : int) =
   System.Console.Write ("You used " + string lstLen + " tries!\n")
 
   ()
+
+
+let rec selCodeAlt () : code =
+  let mutable c : code = []
+  draw [] [Red; Red; Red; Red] GSelector |> ignore
+  while not GCommit do
+    c <- draw [] (selCode ()) GSelector
+  System.Console.Clear()
+  
+  //RESETS GCode
+  GCode <- [|0; 0; 0; 0|] 
+
+  c
+
+
+/// <summary>
+///    Takes a player type and returns a code by the appropriate means.
+/// </summary>
+/// <remarks>
+///   Uses selCode or getRndCode to get the code
+/// </remarks>
+/// <param name="p">
+///    Player type of either Human or Computer
+/// </param name="p">
+/// <returns>
+///   Returns a code.
+/// </returns>
+(*  Game: makeCode*)
+let makeCode (p:player) =
+  match p with
+  | Human    -> selCodeAlt ()
+  | Computer -> getRndCode ()
 
 
 let main () =
