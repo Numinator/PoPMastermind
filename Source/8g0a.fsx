@@ -366,7 +366,7 @@ let gameOverScreen (lstLen : int) =
   ()
 
 
-let rec selCodeAlt () : code =
+let selCodeAlt () : code =
   let mutable c : code = []
   draw [] [Red; Red; Red; Red] GSelector |> ignore
   while not GCommit do
