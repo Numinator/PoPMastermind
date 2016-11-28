@@ -330,22 +330,23 @@ let isGameOver (a: answer * int) =
 
 let draw brd (c : code) sel (* sel for selector *) =
   // CREATES STUFF TO BE DRAWN
-  let header = "\
-*****_____\n\                
-*___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n\
-|    \\  /  |  _ \\ |   ____|  |_|   ___|     ||    \\  /  |    |    \\ | |     \\\n\
-|     \\/   |     \\ `-.`-|_    _|   ___|     \\|     \\/   |    |     \\| |      \\\n\
-|__/\\__/|__|__|\\__|______||__| |______|__|\\__|__/\\__/|__|____|__/\\____|______/\n\
-****|_____|\n\
-***********af Aiyu, Frederik & Rasmus\n\
-\n"
+  let header = 
+   "\n"+
+   "     _____\n"+                
+   " ___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n"+
+   "|    \\  /  |  _ \\ |   ____|  |_|   ___|     ||    \\  /  |    |    \\ | |     \\\n"+
+   "|     \\/   |     \\ `-.`-|_    _|   ___|     \\|     \\/   |    |     \\| |      \\\n"+
+   "|__/\\__/|__|__|\\__|______||__| |______|__|\\__|__/\\__/|__|____|__/\\____|______/\n"+
+   "    |_____|\n"+
+   "             af Aiyu, Frederik & Rasmus\n"+
+   "\n"
   
   let mutable strCodeWithSel = "\n    "
   for i in 0 .. 3 do
     if i = sel then
       strCodeWithSel <- strCodeWithSel + "->" + colPin(c.[i]) + " <-"
     else 
-      strCodeWithSel <- strCodeWithSel + " " + colPin(c.[i]) + "  "
+      strCodeWithSel <- strCodeWithSel + "  " + colPin(c.[i]) + "   "
   strCodeWithSel <- strCodeWithSel + "\n\n\
 Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) |\n\
 Black (b)\n\
@@ -363,14 +364,15 @@ Or use the IJKL-cluster as arrow-keys  -  Press \"C\" to confirm selection...\n"
   
 
 let gameOverScreen (lstLen : int) =
-  let header = "\n\
-|     .::::                                             .::::\n\
-| .:    .::                                         .::    .::\n\
-|.::           .::    .::: .:: .::    .::         .::        .::.::     .::   .::    .: .:::\n\
-|.::         .::  .::  .::  .:  .:: .:   .::      .::        .:: .::   .::  .:   .::  .::\n\
-|.::   .::::.::   .::  .::  .:  .::.::::: .::     .::        .::  .:: .::  .::::: .:: .::\n\   
-| .::    .: .::   .::  .::  .:  .::.:               .::     .::    .:.::   .:         .::\n\  
-|  .:::::     .:: .:::.:::  .:  .::  .::::            .::::         .::      .::::   .:::\n"
+  let header = 
+   "\n\
+   '     .::::                                             .::::\n\
+   ' .:    .::                                         .::    .::\n\
+   '.::           .::    .::: .:: .::    .::         .::        .::.::     .::   .::    .: .:::\n\
+   '.::         .::  .::  .::  .:  .:: .:   .::      .::        .:: .::   .::  .:   .::  .::\n\
+   '.::   .::::.::   .::  .::  .:  .::.::::: .::     .::        .::  .:: .::  .::::: .:: .::\n\
+   ' .::    .: .::   .::  .::  .:  .::.:               .::     .::    .:.::   .:         .::\n\
+   '  .:::::     .:: .:::.:::  .:  .::  .::::            .::::         .::      .::::   .:::\n"
   let winStatusStr = if lstLen > GTries then "lose" else "win"
 
 
@@ -407,8 +409,9 @@ let main () =
          draw brd c GSelector |> ignore
 
          isGameOver (answr, (List.length brd))
+
+    // GAME MUST BE OVER BY THIS POINT IN THE CODE
     gameOverScreen (List.length brd)
-    
-    
+
     ()
 main ()
