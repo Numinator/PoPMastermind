@@ -16,6 +16,8 @@ let mutable GSelector  = 0
 let mutable GCommit = false
 let GCode = [|0; 0; 0; 0|]
 
+let GTries = 9 
+
 
 
 
@@ -321,12 +323,12 @@ let printBoard (brd: board) =
 ///   Returns unit.
 /// </returns>
 (* isGameOver: Part of the guess loop *)
-let isGameOver (a: answer) =
-  if a = (4, 0) then
+let isGameOver (a: answer * int) =
+  if fst a = (4, 0) || snd a > GTries then
     GGameOver <- true
 
 
-let draw brd (c : code) sel =
+let draw brd (c : code) sel (* sel for selector *) =
   // CREATES STUFF TO BE DRAWN
   let header = "\
 *****_____\n\                
@@ -347,7 +349,7 @@ let draw brd (c : code) sel =
   strCodeWithSel <- strCodeWithSel + "\n\n\
 Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) |\n\
 Black (b)\n\
-Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm selcection\n"
+Or use the IJKL-cluster as arrow-keys  -  Press \"C\" to confirm selection...\n"
 
   
   //DRAWS WHAT HAS BEEN CREATED TO THE SCREEN
@@ -359,6 +361,27 @@ Or use the IJKL-cluster as the arrow-keys  -  Press \"C\" to confirm selcection\
   //RETURN THE CODE USED FOR FUTHER USE BY OTHER FUNCTIONS
   c
   
+
+let gameOverScreen (lstLen : int) =
+  let header = "\n\
+|     .::::                                             .::::\n\
+| .:    .::                                         .::    .::\n\
+|.::           .::    .::: .:: .::    .::         .::        .::.::     .::   .::    .: .:::\n\
+|.::         .::  .::  .::  .:  .:: .:   .::      .::        .:: .::   .::  .:   .::  .::\n\
+|.::   .::::.::   .::  .::  .:  .::.::::: .::     .::        .::  .:: .::  .::::: .:: .::\n\   
+| .::    .: .::   .::  .::  .:  .::.:               .::     .::    .:.::   .:         .::\n\  
+|  .:::::     .:: .:::.:::  .:  .::  .::::            .::::         .::      .::::   .:::\n"
+  let winStatusStr = if lstLen > GTries then "lose" else "win"
+
+
+  System.Console.Clear()
+  System.Console.Write header
+  System.Console.Write ("\nYou " + winStatusStr + " the game!\n")
+  System.Console.Write ("You used " + string lstLen + " tries!\n")
+
+  ()
+
+
 let main () =
     // INIT
     System.Console.Title <- "Mastermind - Super Cool™ edition"
@@ -371,6 +394,7 @@ let main () =
     // GET THE SECRET CODE
     let cSecret = makeCode p1
     
+    //GAME LOGIC (GAME LOOP)
     draw brd [Red; Red; Red; Red] GSelector |> ignore
     while not GGameOver do
        let c = draw brd (guess p2 brd) GSelector
@@ -378,33 +402,13 @@ let main () =
          GCommit <- false
          let answr = validate c cSecret
          brd <- addGuess brd c answr
-         isGameOver answr
-    draw brd [Red; White; Red; White] GSelector |> ignore
          
+         // SHOW THE UPDATED BOARD TO THE USER
+         draw brd c GSelector |> ignore
 
-
-         
-
-
-
-
-
-
-
-
-
-
-
-    //printfn "%A" list
-    // let p = askPlayerType ()
-    // let realCode = makeCode (p)
-    // let mutable board = []
-
-    // while not(GGameOver) do
-    //   let currentGuess = guess (p) board
-    //   let answer = validate (realCode) (currentGuess)
-    //   board <- addGuess board currentGuess answer
-    //   isGameOver (answer)
-    //   System.Console.Write (printBoard board)
+         isGameOver (answr, (List.length brd))
+    gameOverScreen (List.length brd)
+    
+    
     ()
 main ()
