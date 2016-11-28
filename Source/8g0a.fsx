@@ -373,8 +373,9 @@ let rec selCodeAlt () : code =
     c <- draw [] (selCode ()) GSelector
   System.Console.Clear()
   
-  //RESETS GCode
+  //RESETS GCode and GCommit
   GCode <- [|0; 0; 0; 0|] 
+  GCommit <- false
 
   c
 
