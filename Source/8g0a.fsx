@@ -15,7 +15,7 @@ let mutable GGameOver = false
 let mutable GSelector  = 0
 let mutable GCommit = false
 let mutable GCode = [|0; 0; 0; 0|]
-let GTries = 9 
+let GTries = 9
 
 
 
@@ -42,7 +42,7 @@ let numToCol n =
     | 4 -> White
     | 5 -> Black
 
-let colToNum c = 
+let colToNum c =
   match c with
   | Red    -> 0
   | Green  -> 1
@@ -122,7 +122,7 @@ let rec askPlayerType () =
 
 
 /// <summary>
-///    Ask the user for a change to the input code or selector possition. 
+///    Ask the user for a change to the input code or selector possition.
 /// </summary>
 /// <remarks>
 ///   Dependes on the global varibles GCommit and GSelector
@@ -149,9 +149,9 @@ let selCode () : code =
       | "w" -> GCode.[GSelector] <- 4; GSelector <- (GSelector + 1) % 4; bRun <- false
       | "b" -> GCode.[GSelector] <- 5; GSelector <- (GSelector + 1) % 4; bRun <- false
       | _   -> ()
-    
-    Array.map numToCol GCode |> Array.toList 
-    
+
+    Array.map numToCol GCode |> Array.toList
+
 
 
 
@@ -200,6 +200,7 @@ let validate (rc: code) (c: code) :answer =
   let histC       = [|0;0;0;0;0;0|]
   let histRc      = [|0;0;0;0;0;0|]
   let mutable sum = 0
+
   for i=0 to 3 do
     if rc.[i] = c.[i] then
       b <- b + 1
@@ -261,11 +262,11 @@ let colPin (c: codeColor) =
   | Red    -> "\x1b[31;1m\u262d\x1b[37;0m"
   | Green  -> "\x1b[32;1m\u2623\x1b[37;0m"
   | Yellow -> "\x1b[33;1m\u2622\x1b[37;0m"
-  | Purple -> "\x1b[35;1m\ud83c\udf03\x1b[37;0m" 
-  | White  -> "\x1b[37;1m\u2620\x1b[37;0m" 
-  | Black  -> "\x1b[30;1m\u26f0\x1b[37;0m" 
+  | Purple -> "\x1b[35;1m\ud83c\udf03\x1b[37;0m"
+  | White  -> "\x1b[37;1m\u2620\x1b[37;0m"
+  | Black  -> "\x1b[30;1m\u26f0\x1b[37;0m"
 
-    
+
 
 
 
@@ -280,9 +281,9 @@ let colPin (c: codeColor) =
 /// </returns>
 (* printBoard: Part of the guess loop *)
 let printBoard (brd: board) =
-  let mutable brdStr = "" 
+  let mutable brdStr = ""
   let edge = "-------------------------"
-  let str: Printf.StringFormat<_>  = "| %s | %s | %s | %s | %i - %i |"
+  let str: Printf.StringFormat<_>  = "| %s | %s | %s | %s |\x1b[30;1m %i \x1b[37;0m-\x1b[37;1m %i \x1b[37;0m|"
   brdStr <- edge + "\n"
   for i in brd do
     let f j =  colPin (fst i).[j]
@@ -312,9 +313,9 @@ let isGameOver (a: answer * int) =
 
 let draw brd (c : code) sel (* sel for selector *) =
   // CREATES STUFF TO BE DRAWN
-  let header = 
+  let header =
    "\n"+
-   "     _____\n"+                
+   "     _____\n"+
    " ___|    _|_ ___   ______  __   ______ _____  ____    __ ____ ____   _ _____\n"+
    "|    \\  /  |  _ \\ |   ____|  |_|   ___|     ||    \\  /  |    |    \\ | |     \\\n"+
    "|     \\/   |     \\ `-.`-|_    _|   ___|     \\|     \\/   |    |     \\| |      \\\n"+
@@ -322,31 +323,31 @@ let draw brd (c : code) sel (* sel for selector *) =
    "    |_____|\n"+
    "             af Aiyu, Frederik & Rasmus\n"+
    "\n"
-  
+
   let mutable strCodeWithSel = "\n    "
   for i in 0 .. 3 do
     if i = sel then
       strCodeWithSel <- strCodeWithSel + "->" + colPin(c.[i]) + " <-"
-    else 
+    else
       strCodeWithSel <- strCodeWithSel + "  " + colPin(c.[i]) + "   "
   strCodeWithSel <- strCodeWithSel + "\n\n\
 Possible colors: Red (r) | Green (g) | Yellow (y) | Purple (p) | White (w) |\n\
 Black (b)\n\
 Or use the IJKL-cluster as arrow-keys  -  Press \"C\" to confirm selection...\n"
 
-  
+
   //DRAWS WHAT HAS BEEN CREATED TO THE SCREEN
   System.Console.Clear()
   System.Console.Write header
   System.Console.Write (printBoard brd)
   System.Console.Write strCodeWithSel
-  
+
   //RETURN THE CODE USED FOR FUTHER USE BY OTHER FUNCTIONS
   c
-  
+
 
 let gameOverScreen (lstLen : int) =
-  let header = 
+  let header =
    "\n\
    '     .::::                                             .::::\n\
    ' .:    .::                                         .::    .::\n\
@@ -372,9 +373,9 @@ let selCodeAlt () : code =
   while not GCommit do
     c <- draw [] (selCode ()) GSelector
   System.Console.Clear()
-  
+
   //RESETS GCode and GCommit
-  GCode <- [|0; 0; 0; 0|] 
+  GCode <- [|0; 0; 0; 0|]
   GCommit <- false
 
   c
@@ -407,10 +408,10 @@ let main () =
     // GET PLAYERS
     let p1 = askPlayerType ()
     let p2 = askPlayerType ()
-    
+
     // GET THE SECRET CODE
     let cSecret = makeCode p1
-    
+
     //GAME LOGIC (GAME LOOP)
     draw brd [Red; Red; Red; Red] GSelector |> ignore
     while not GGameOver do
@@ -419,7 +420,7 @@ let main () =
          GCommit <- false
          let answr = validate c cSecret
          brd <- addGuess brd c answr
-         
+
          // SHOW THE UPDATED BOARD TO THE USER
          draw brd c GSelector |> ignore
 
