@@ -20,6 +20,7 @@ let GTries = 9
 
 
 
+
 /// <summary>
 ///    Converts the numbers 0-5 to its equivalent colour.
 /// </summary>
@@ -40,7 +41,7 @@ let numToCol n =
     | 2 -> Yellow
     | 3 -> Purple
     | 4 -> White
-    | 5 -> Black
+    | _ -> Black
 
 let colToNum c =
   match c with
@@ -51,7 +52,11 @@ let colToNum c =
   | White  -> 4
   | Black  -> 5
 
-
+let mutable GTestList = [for i in 0..5 do
+                         for j in 0..5 do
+                          for k in 0..5 do
+                           for l in 0..5 do
+                            yield [numToCol i; numToCol j; numToCol k; numToCol l]]
 
 /// <summary>
 ///    Creates a pesudo random code of length 4.
@@ -65,9 +70,7 @@ let colToNum c =
 (* getRdnCode: Helper function to makeCode *)
 let getRndCode ():code=
     let rnd = System.Random()
-    let list = [numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);
-                numToCol (rnd.Next() % 6);numToCol (rnd.Next() % 6);]
-//    [fun for _ in 1..4 -> (numToCol (rnd.Next() % 6))]
+    let list = [for _ in 1..4 -> (numToCol (rnd.Next() % 6))]
     list
 
 
@@ -122,13 +125,13 @@ let rec askPlayerType () =
 
 
 /// <summary>
-///    Ask the user for a change to the input code or selector possition.
+///    Ask the user for a change to the input code or selector posistion.
 /// </summary>
 /// <remarks>
 ///   Dependes on the global varibles GCommit and GSelector
 /// </remarks>
 /// <returns>
-///   Returns a valid code.
+///   Returns a valid code (i.e. with a length of 4).
 /// </returns>
 (* selCode: Helper function to makeCode *)
 let selCode () : code =
@@ -153,7 +156,8 @@ let selCode () : code =
     Array.map numToCol GCode |> Array.toList
 
 
-
+let computeGuess () :code =
+    GTestList.[0]
 
 
 /// <summary>
@@ -174,7 +178,7 @@ let selCode () : code =
 let guess (p:player) (brd:board) : code =
   match p with
   | Human     -> selCode ()
-  | Computer  -> getRndCode ()
+  | Computer  -> computeGuess ()
 
 
 /// <summary>
@@ -372,6 +376,7 @@ let selCodeAlt () : code =
   draw [] [Red; Red; Red; Red] GSelector |> ignore
   while not GCommit do
     c <- draw [] (selCode ()) GSelector
+    System.Console.Write "You are currently selecting the secret code...\n"
   System.Console.Clear()
 
   //RESETS GCode and GCommit
@@ -420,6 +425,8 @@ let main () =
          GCommit <- false
          let answr = validate c cSecret
          brd <- addGuess brd c answr
+
+         GTestList <- List.filter(fun x -> (validate c x) = answr) GTestList.[1..GTestList.Length-1]
 
          // SHOW THE UPDATED BOARD TO THE USER
          draw brd c GSelector |> ignore
