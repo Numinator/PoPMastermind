@@ -16,7 +16,7 @@ let mutable GSelector  = 0
 let mutable GCommit = false
 let mutable GCode = [|0; 0; 0; 0|]
 let GTries = 9
-// Global variable GTestList is defined on line 
+// Global variable GTestList is defined on line 60
 
 
 
@@ -43,6 +43,10 @@ let numToCol n =
     | 4 -> White
     | _ -> Black
 
+
+/// <summary>
+///    The reverse function to numToCol
+/// </summary>
 let colToNum c =
   match c with
   | Red    -> 0
@@ -130,7 +134,16 @@ let selCode () : code =
 
     Array.map numToCol GCode |> Array.toList
 
-
+/// <summary>
+///    Computes a smart guess.
+/// </summary>
+/// <remarks>
+///   Dependes on the global varible GTestList. Uses an averege guess of ~6
+///   guesses to guess the secret code.
+/// </remarks>
+/// <returns>
+///   Returns a valid code (i.e. with a length of 4).
+/// </returns>
 let computeGuess () :code =
     GTestList.[0]
 
@@ -139,17 +152,15 @@ let computeGuess () :code =
 ///    Takes a player type and returns a code by the appropriate means.
 /// </summary>
 /// <remarks>
-///   Uses selCode or getRndCode to get the code
+///   Uses selCode or computeGuess to get the code
 /// </remarks>
 /// <param name="p">
 ///    Player type of either Human or Computer
 /// </param name="p">
 /// <returns>
-///   Returns a code.
+///   Returns a valid code (i.e. with a length of 4).
 /// </returns>
 (* Game: guess *)
-//guess skal modificeres til at kunne gøre noget med board - evt. foretage et bedre valg.
-//evt. sprintBoard
 let guess (p:player) (brd:board) : code =
   match p with
   | Human     -> selCode ()
@@ -163,45 +174,45 @@ let guess (p:player) (brd:board) : code =
 ///   The function is "symetric", so it does not matter in wich order the codes
 ///   are given.
 /// </remarks>
-/// <param name="rc">
-///    A code, from either of the players.
-/// </param name="rc">
-/// <param name="c">
-///    The other code from either the players.
-/// </param name="c">
+/// <param name="rhsC">
+///    A code, from either of the players playing the game.
+/// </param name="rhsC">
+/// <param name="lhsC">
+///    The other code from either the players playing the game.
+/// </param name="lhsC">
 /// <returns>
-///   Returns an anwser with no overlap in the white and black.
+///   Returns an anwser with no overlap in the whites and blacks.
 /// </returns>
-(* validate: Part of the guess loop  *)
-let validate (rc: code) (c: code) :answer =
+(* validate: Part of the guess loop  | hist for histogram*)
+let validate (rhsC: code) (lhsC: code) :answer =
   let mutable i   = 0
   let mutable b   = 0
-  let histC       = [|0;0;0;0;0;0|]
-  let histRc      = [|0;0;0;0;0;0|]
+  let histLhsC       = [|0;0;0;0;0;0|]
+  let histRhsC      = [|0;0;0;0;0;0|]
   let mutable sum = 0
 
   for i=0 to 3 do
-    if rc.[i] = c.[i] then
+    if rhsC.[i] = lhsC.[i] then
       b <- b + 1
 
-    match rc.[i] with
-    | Red    -> histRc.[0] <- histRc.[0]+1
-    | Green  -> histRc.[1] <- histRc.[1]+1
-    | Yellow -> histRc.[2] <- histRc.[2]+1
-    | Purple -> histRc.[3] <- histRc.[3]+1
-    | White  -> histRc.[4] <- histRc.[4]+1
-    | Black  -> histRc.[5] <- histRc.[5]+1
+    match rhsC.[i] with
+    | Red    -> histRhsC.[0] <- histRhsC.[0]+1
+    | Green  -> histRhsC.[1] <- histRhsC.[1]+1
+    | Yellow -> histRhsC.[2] <- histRhsC.[2]+1
+    | Purple -> histRhsC.[3] <- histRhsC.[3]+1
+    | White  -> histRhsC.[4] <- histRhsC.[4]+1
+    | Black  -> histRhsC.[5] <- histRhsC.[5]+1
 
-    match c.[i] with
-    | Red    -> histC.[0] <- histC.[0]+1
-    | Green  -> histC.[1] <- histC.[1]+1
-    | Yellow -> histC.[2] <- histC.[2]+1
-    | Purple -> histC.[3] <- histC.[3]+1
-    | White  -> histC.[4] <- histC.[4]+1
-    | Black  -> histC.[5] <- histC.[5]+1
+    match lhsC.[i] with
+    | Red    -> histLhsC.[0] <- histLhsC.[0]+1
+    | Green  -> histLhsC.[1] <- histLhsC.[1]+1
+    | Yellow -> histLhsC.[2] <- histLhsC.[2]+1
+    | Purple -> histLhsC.[3] <- histLhsC.[3]+1
+    | White  -> histLhsC.[4] <- histLhsC.[4]+1
+    | Black  -> histLhsC.[5] <- histLhsC.[5]+1
 
   for i=0 to 5 do
-    sum <- sum + (min (histC.[i]) (histRc.[i]))
+    sum <- sum + (min (histLhsC.[i]) (histRhsC.[i]))
 
   (b, sum - b)
 
@@ -227,13 +238,13 @@ let addGuess (brd: board) (c: code) (a: answer):board=
 
 
 /// <summary>
-///   Takes a colour and returns the first letter of the colour name as a string
+///   Takes a colour and returns the appropriate symbol with the same colour.
 /// </summary>
 /// <param name="c">
 ///    The colour used.
 /// </param name="c">
 /// <returns>
-///   Returns a string that is the frist letter of the colour name.
+///   Returns a string.
 /// </returns>
 (* colPin: Helper function to sprintBoard *)
 let colPin (c: codeColor) =
@@ -250,7 +261,8 @@ let colPin (c: codeColor) =
 
 
 /// <summary>
-///    Takes a board and makes a string in a formated way, that represents the board.
+///    Takes a board and makes a string in a formated way, that represents the 
+//     board.
 /// </summary>
 /// <param name="brd">
 ///    The board that gets printed.
@@ -279,17 +291,36 @@ let sprintBoard (brd: board) =
 ///   GGameOver is a global varible that must be present.
 /// </remarks>
 /// <param name="a">
-///    Answer that is used to check if the game is over.
+///    A tuple of type answer * int, used to check if the game is over
 /// </param name="a">
 /// <returns>
-///   Returns unit.
+///   Returns unit, but has the side effect of changing the global variable
+//    GGameOver to false.
 /// </returns>
 (* isGameOver: Part of the guess loop *)
 let isGameOver (a: answer * int) =
   if fst a = (4, 0) || snd a > GTries then
     GGameOver <- true
 
-
+/// <summary>
+///    Draws the board and selection bar to the console terminal.
+/// </summary>
+/// <remarks>
+///   The function is called for its side effects.
+/// </remarks>
+/// <param name="brd">
+///    The board which get drawn
+/// </param name="brd">
+/// <param name="c">
+///    The code that gets drawn in the selection bar
+/// </param name="c">
+/// <param name="sel">
+///    Selectors position in the selection bar
+/// </param name="sel">
+/// <returns>
+///   Returns the code "c" unchanged.
+/// </returns>
+(* addGuess: Part of the guess loop *)
 let draw brd (c : code) sel (* sel for selector *) =
   // CREATES STUFF TO BE DRAWN
   let header =
@@ -324,8 +355,20 @@ Or use the IJKL-cluster as arrow-keys  -  Press \"C\" to confirm selection...\n"
   //RETURN THE CODE USED FOR FUTHER USE BY OTHER FUNCTIONS
   c
 
-
-let gameOverScreen (lstLen : int) =
+/// <summary>
+///    Draws a game overscreen with some game statistics to the console terminal
+/// </summary>
+/// <remarks>
+///   It gets the number of tries by taking the length of brd.
+/// </remarks>
+/// <param name="brd">
+///    The board for which the game statistics get extraced from.
+/// </param name="brd">
+/// <returns>
+///   Returns unit.
+/// </returns>
+let gameOverScreen brd =
+  let lstLen = List.length brd // equals the number of tries used
   let header =
    "\n\
    '     .::::                                             .::::\n\
@@ -345,7 +388,15 @@ let gameOverScreen (lstLen : int) =
 
   ()
 
-
+/// <summary>
+///   Asks a human player for the secret code in a graphical way.
+/// </summary>
+/// <remarks>
+///   Calls selCode with wrapper code around to achive goal.
+/// </remarks>
+/// <returns>
+///   Returns the inputed code.
+/// </returns>
 let selSecretCode () : code =
   let mutable c : code = []
   draw [] [Red; Red; Red; Red] GSelector |> ignore
@@ -412,7 +463,7 @@ let main () =
          isGameOver (answr, (List.length brd))
 
     // GAME MUST BE OVER BY THIS POINT IN THE CODE, THERFORE:
-    gameOverScreen (List.length brd)
+    gameOverScreen brd
 
     ()
 main ()
