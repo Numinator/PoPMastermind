@@ -74,33 +74,6 @@ let getRndCode ():code=
     list
 
 
-/// <summary>
-///    Converts string to its equivalent colour.
-/// </summary>
-/// <remarks>
-///   The function is case sensetive and compares with all lowercase
-///   strings. The format of the string being compared to is: "colour"
-///   || "c", where colour is any of the colours in colour-type
-/// </remarks>
-/// <param name="s">
-///   A string.
-/// </param name="s">
-/// <returns>
-///   Returns None if the input does not match the a colour; else a colour
-///   encapsulated in Some.
-/// </returns>
-(* stringToCol: Helper function to selCode *)
-let stringToCol s =
-    match s with
-    | s when s="red" || s="r"    -> Some(Red)
-    | s when s="green" || s="g"  -> Some(Green)
-    | s when s="yellow" || s="y" -> Some(Yellow)
-    | s when s="purple" || s="p" -> Some(Purple)
-    | s when s="white" || s="w"  -> Some(White)
-    | s when s="black" || s="b"  -> Some(Black)
-    | _                          -> None
-
-
 
 /// <summary>
 ///    Asks for at player-type from the user.
@@ -174,7 +147,7 @@ let computeGuess () :code =
 /// </returns>
 (* Game: guess *)
 //guess skal modificeres til at kunne gøre noget med board - evt. foretage et bedre valg.
-//evt. printBoard
+//evt. sprintBoard
 let guess (p:player) (brd:board) : code =
   match p with
   | Human     -> selCode ()
@@ -260,7 +233,7 @@ let addGuess (brd: board) (c: code) (a: answer):board=
 /// <returns>
 ///   Returns a string that is the frist letter of the colour name.
 /// </returns>
-(* colPin: Helper function to printBoard *)
+(* colPin: Helper function to sprintBoard *)
 let colPin (c: codeColor) =
   match c with
   | Red    -> "\x1b[31;1m\u262d\x1b[37;0m"
@@ -283,8 +256,8 @@ let colPin (c: codeColor) =
 /// <returns>
 ///   Returns a string.
 /// </returns>
-(* printBoard: Part of the guess loop *)
-let printBoard (brd: board) =
+(* sprintBoard: Part of the guess loop *)
+let sprintBoard (brd: board) =
   let mutable brdStr = ""
   let edge = "-------------------------"
   let str: Printf.StringFormat<_>  = "| %s | %s | %s | %s |\x1b[30;1m %i \x1b[37;0m-\x1b[37;1m %i \x1b[37;0m|"
@@ -343,7 +316,7 @@ Or use the IJKL-cluster as arrow-keys  -  Press \"C\" to confirm selection...\n"
   //DRAWS WHAT HAS BEEN CREATED TO THE SCREEN
   System.Console.Clear()
   System.Console.Write header
-  System.Console.Write (printBoard brd)
+  System.Console.Write (sprintBoard brd)
   System.Console.Write strCodeWithSel
 
   //RETURN THE CODE USED FOR FUTHER USE BY OTHER FUNCTIONS
@@ -412,30 +385,31 @@ let main () =
     System.Console.Title <- "Mastermind - Super Cool™ edition"
     let mutable brd : board = []
 
-    // GET PLAYERS
+    // GETS PLAYERS
     let p1 = askPlayerType ()
     let p2 = askPlayerType ()
 
-    // GET THE SECRET CODE
+    // GETS THE SECRET CODE
     let cSecret = makeCode p1
 
     //GAME LOGIC (GAME LOOP)
     draw brd [Red; Red; Red; Red] GSelector |> ignore
     while not GGameOver do
-       let c = guess p2 brd 
+       let c = draw brd (guess p2 brd) GSelector
        if GCommit || p2 = Computer then
          GCommit <- false
          let answr = validate c cSecret
          brd <- addGuess brd c answr
 
-         GTestList <- List.filter(fun x -> (validate c x) = answr) GTestList.[1..GTestList.Length-1]
+         GTestList <- List.filter(fun x -> (validate c x) = answr) 
+                      GTestList.[1..GTestList.Length-1] //All but the first elem
 
-         // SHOW THE UPDATED BOARD TO THE USER
+         // SHOWS THE UPDATED BOARD /W COMMITED GUESS TO THE USER
          draw brd c GSelector |> ignore
 
          isGameOver (answr, (List.length brd))
 
-    // GAME MUST BE OVER BY THIS POINT IN THE CODE
+    // GAME MUST BE OVER BY THIS POINT IN THE CODE, THERFORE:
     gameOverScreen (List.length brd)
 
     ()

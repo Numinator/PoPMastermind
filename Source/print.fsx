@@ -23,7 +23,7 @@ let colPin (c: codeColor) =
   | White  -> "W"
   | Black  -> "B"
 
-let printBoard (brd: board) = 
+let sprintBoard (brd: board) = 
   let edge:Printf.TextWriterFormat<_> = "-------------------------"
   let str:Printf.TextWriterFormat<_>  = "| %s | %s | %s | %s | %i - %i |"
   printfn edge
