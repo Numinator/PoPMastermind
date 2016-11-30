@@ -16,7 +16,7 @@ let mutable GSelector  = 0
 let mutable GCommit = false
 let mutable GCode = [|0; 0; 0; 0|]
 let GTries = 9
-
+// Global variable GTestList is defined on line 
 
 
 
@@ -52,6 +52,7 @@ let colToNum c =
   | White  -> 4
   | Black  -> 5
 
+(*Yet another global variable*)
 let mutable GTestList = [for i in 0..5 do
                          for j in 0..5 do
                           for k in 0..5 do
@@ -101,7 +102,8 @@ let rec askPlayerType () =
 ///    Ask the user for a change to the input code or selector posistion.
 /// </summary>
 /// <remarks>
-///   Dependes on the global varibles GCommit and GSelector
+///   Dependes on the global varibles GCommit and GSelector. It keeps
+///   taking and ignoring input until the user gives a valid one.
 /// </remarks>
 /// <returns>
 ///   Returns a valid code (i.e. with a length of 4).
