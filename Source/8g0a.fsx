@@ -377,6 +377,8 @@ let selSecretCode () : code =
   while not GCommit do
     c <- draw [] (selCode ()) GSelector
     System.Console.Write "You are currently selecting the secret code...\n"
+  
+  //REMOVES THE SELECTED SECRET CODE FROM THE SCREEN
   System.Console.Clear()
 
   //RESETS GCode and GCommit
@@ -420,7 +422,7 @@ let main () =
     //GAME LOGIC (GAME LOOP)
     draw brd [Red; Red; Red; Red] GSelector |> ignore
     while not GGameOver do
-       let c = draw brd (guess p2 brd) GSelector
+       let c = guess p2 brd 
        if GCommit || p2 = Computer then
          GCommit <- false
          let answr = validate c cSecret
