@@ -371,7 +371,7 @@ let gameOverScreen (lstLen : int) =
   ()
 
 
-let selCodeAlt () : code =
+let selSecretCode () : code =
   let mutable c : code = []
   draw [] [Red; Red; Red; Red] GSelector |> ignore
   while not GCommit do
@@ -401,7 +401,7 @@ let selCodeAlt () : code =
 (*  Game: makeCode*)
 let makeCode (p:player) =
   match p with
-  | Human    -> selCodeAlt ()
+  | Human    -> selSecretCode ()
   | Computer -> getRndCode ()
 
 
