@@ -261,7 +261,7 @@ let colPin (c: codeColor) =
 
 
 /// <summary>
-///    Takes a board and makes a string in a formated way, that represents the 
+///    Takes a board and makes a string in a formated way, that represents the
 //     board.
 /// </summary>
 /// <param name="brd">
@@ -403,7 +403,7 @@ let selSecretCode () : code =
   while not GCommit do
     c <- draw [] (selCode ()) GSelector
     System.Console.Write "You are currently selecting the secret code...\n"
-  
+
   //REMOVES THE SELECTED SECRET CODE FROM THE SCREEN
   System.Console.Clear()
 
@@ -454,7 +454,7 @@ let main () =
          let answr = validate c cSecret
          brd <- addGuess brd c answr
 
-         GTestList <- List.filter(fun x -> (validate c x) = answr) 
+         GTestList <- List.filter(fun x -> (validate c x) = answr)
                       GTestList.[1..GTestList.Length-1] //All but the first elem
 
          // SHOWS THE UPDATED BOARD /W COMMITED GUESS TO THE USER
